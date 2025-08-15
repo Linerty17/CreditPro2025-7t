@@ -13,16 +13,16 @@ export default function DashboardPage() {
     const savedUserData = localStorage.getItem("cashpro-user")
     const isLoggedIn = localStorage.getItem("cashpro-logged-in")
 
-    if (isLoggedIn === "true" && savedUserData) {
-      setUserData(JSON.parse(savedUserData))
-    } else {
-      router.push("/code")
+    if (!savedUserData || isLoggedIn !== "true") {
+      router.push("/register")
+      return
     }
+
+    setUserData(JSON.parse(savedUserData))
   }, [router])
 
   const handleNavigate = (page: string) => {
-    if (page === "contact") router.push("/contact")
-    if (page === "about") router.push("/about")
+    router.push(`/${page}`)
   }
 
   if (!userData) {

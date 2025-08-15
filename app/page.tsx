@@ -10,7 +10,7 @@ export default function HomePage() {
     const savedUserData = localStorage.getItem("cashpro-user")
     const isLoggedIn = localStorage.getItem("cashpro-logged-in")
 
-    if (isLoggedIn === "true" && savedUserData) {
+    if (isLoggedIn === "true") {
       router.push("/dashboard")
     } else if (savedUserData) {
       router.push("/code")

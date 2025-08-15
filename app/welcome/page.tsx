@@ -1,26 +1,26 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { WelcomeModal } from "@/components/welcome-modal"
 
 export default function WelcomePage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [userData, setUserData] = useState<any>(null)
   const [isReturningUser, setIsReturningUser] = useState(false)
 
   useEffect(() => {
     const savedUserData = localStorage.getItem("cashpro-user")
-    const returning = searchParams.get("returning") === "true"
-
     if (savedUserData) {
-      setUserData(JSON.parse(savedUserData))
-      setIsReturningUser(returning)
+      const parsedData = JSON.parse(savedUserData)
+      setUserData(parsedData)
+
+      const isLoggedIn = localStorage.getItem("cashpro-logged-in")
+      setIsReturningUser(isLoggedIn === "true")
     } else {
       router.push("/register")
     }
-  }, [router, searchParams])
+  }, [router])
 
   const handleWelcomeComplete = () => {
     router.push("/code")

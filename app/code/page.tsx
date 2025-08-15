@@ -7,17 +7,18 @@ import { Navigation } from "@/components/navigation"
 
 export default function CodePage() {
   const router = useRouter()
-  const [userData, setUserData] = useState<any>(null)
   const [isReturningUser, setIsReturningUser] = useState(false)
 
   useEffect(() => {
     const savedUserData = localStorage.getItem("cashpro-user")
-    if (savedUserData) {
-      setUserData(JSON.parse(savedUserData))
-      setIsReturningUser(true)
-    } else {
+    const isLoggedIn = localStorage.getItem("cashpro-logged-in")
+
+    if (!savedUserData) {
       router.push("/register")
+      return
     }
+
+    setIsReturningUser(isLoggedIn === "true")
   }, [router])
 
   const handleCodeVerified = () => {
@@ -30,16 +31,7 @@ export default function CodePage() {
   }
 
   const handleNavigate = (page: string) => {
-    if (page === "contact") router.push("/contact")
-    if (page === "about") router.push("/about")
-  }
-
-  if (!userData) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-card to-primary/10 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    )
+    router.push(`/${page}`)
   }
 
   return (
