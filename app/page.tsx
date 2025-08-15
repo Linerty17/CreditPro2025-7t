@@ -6,8 +6,11 @@ import { WelcomeModal } from "@/components/welcome-modal"
 import { CodeVerification } from "@/components/code-verification"
 import { Dashboard } from "@/components/dashboard"
 import { PaymentFlow } from "@/components/payment-flow"
+import { ContactPage } from "@/components/contact-page"
+import { AboutPage } from "@/components/about-page"
+import { Navigation } from "@/components/navigation"
 
-type AppState = "registration" | "welcome" | "verification" | "payment" | "dashboard"
+type AppState = "registration" | "welcome" | "verification" | "payment" | "dashboard" | "contact" | "about"
 
 interface UserData {
   fullName: string
@@ -56,8 +59,24 @@ export default function CashProApp() {
     setCurrentState("verification")
   }
 
+  const handleNavigate = (page: AppState) => {
+    setCurrentState(page)
+  }
+
+  const handleBackToMain = () => {
+    if (userData) {
+      setCurrentState("dashboard")
+    } else {
+      setCurrentState("verification")
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-card to-primary/10">
+      {(currentState === "verification" || currentState === "dashboard") && (
+        <Navigation onNavigate={handleNavigate} currentState={currentState} />
+      )}
+
       {currentState === "registration" && <RegistrationForm onComplete={handleRegistrationComplete} />}
 
       {currentState === "welcome" && showWelcome && (
@@ -79,6 +98,10 @@ export default function CashProApp() {
       {currentState === "payment" && userData && <PaymentFlow userData={userData} onComplete={handlePaymentComplete} />}
 
       {currentState === "dashboard" && userData && <Dashboard userData={userData} />}
+
+      {currentState === "contact" && <ContactPage onBack={handleBackToMain} />}
+
+      {currentState === "about" && <AboutPage onBack={handleBackToMain} />}
     </div>
   )
 }

@@ -31,7 +31,7 @@ export function CodeVerification({ onVerified, onSignUp, isReturningUser }: Code
       setIsLoading(true)
       await new Promise((resolve) => setTimeout(resolve, 1500))
 
-      if (code === "200717") {
+      if (code === "22334") {
         setIsLoading(false)
         onVerified()
       } else {

@@ -269,7 +269,7 @@ export function PaymentFlow({ userData, onComplete }: PaymentFlowProps) {
 
               <div className="bg-gradient-to-r from-accent to-primary p-6 rounded-lg">
                 <p className="text-accent-foreground font-medium mb-2">Your Access Code:</p>
-                <div className="text-4xl font-bold text-accent-foreground font-mono tracking-widest">200717</div>
+                <div className="text-4xl font-bold text-accent-foreground font-mono tracking-widest">22334</div>
               </div>
 
               <p className="text-sm text-muted-foreground">
