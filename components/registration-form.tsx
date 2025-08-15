@@ -43,6 +43,7 @@ export function RegistrationForm({ onComplete }: RegistrationFormProps) {
     nationality: "",
   })
   const [isLoading, setIsLoading] = useState(false)
+  const [isLoginMode, setIsLoginMode] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -51,8 +52,38 @@ export function RegistrationForm({ onComplete }: RegistrationFormProps) {
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1500))
 
-    setIsLoading(false)
-    onComplete(formData)
+    if (isLoginMode) {
+      // Check if user exists in localStorage
+      const existingUsers = JSON.parse(localStorage.getItem("cashpro_users") || "[]")
+      const user = existingUsers.find((u: UserData) => u.email === formData.email)
+
+      if (user) {
+        setIsLoading(false)
+        onComplete(user)
+      } else {
+        setIsLoading(false)
+        alert("User not found. Please register first.")
+        setIsLoginMode(false)
+        return
+      }
+    } else {
+      // Registration logic
+      const existingUsers = JSON.parse(localStorage.getItem("cashpro_users") || "[]")
+      const userExists = existingUsers.find((u: UserData) => u.email === formData.email)
+
+      if (userExists) {
+        setIsLoading(false)
+        alert("User already exists. Please login instead.")
+        setIsLoginMode(true)
+        return
+      }
+
+      // Save new user
+      existingUsers.push(formData)
+      localStorage.setItem("cashpro_users", JSON.stringify(existingUsers))
+      setIsLoading(false)
+      onComplete(formData)
+    }
   }
 
   const handleInputChange = (field: keyof UserData, value: string) => {
@@ -65,33 +96,35 @@ export function RegistrationForm({ onComplete }: RegistrationFormProps) {
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-2xl border-0 bg-card/80 backdrop-blur-sm">
         <CardHeader className="text-center space-y-4">
-          <div className="mx-auto w-20 h-20 bg-gradient-to-br from-accent to-primary rounded-full flex items-center justify-center">
-            <span className="text-2xl font-bold text-accent-foreground font-serif">CP</span>
+          <div className="mx-auto w-20 h-20">
+            <img src="/cashpro-logo.png" alt="CashPro Logo" className="w-full h-full object-contain" />
           </div>
           <CardTitle className="text-3xl font-serif bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">
-            Welcome to CashPro
+            {isLoginMode ? "Welcome Back" : "Welcome to CashPro"}
           </CardTitle>
           <CardDescription className="text-muted-foreground">
-            Join thousands earning money by watching videos
+            {isLoginMode ? "Login to continue earning" : "Join thousands earning money by watching videos"}
           </CardDescription>
         </CardHeader>
 
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="fullName" className="text-sm font-medium">
-                Full Name
-              </Label>
-              <Input
-                id="fullName"
-                type="text"
-                placeholder="Enter your full name"
-                value={formData.fullName}
-                onChange={(e) => handleInputChange("fullName", e.target.value)}
-                className="h-12 bg-input border-border focus:ring-2 focus:ring-ring"
-                required
-              />
-            </div>
+            {!isLoginMode && (
+              <div className="space-y-2">
+                <Label htmlFor="fullName" className="text-sm font-medium">
+                  Full Name
+                </Label>
+                <Input
+                  id="fullName"
+                  type="text"
+                  placeholder="Enter your full name"
+                  value={formData.fullName}
+                  onChange={(e) => handleInputChange("fullName", e.target.value)}
+                  className="h-12 bg-input border-border focus:ring-2 focus:ring-ring"
+                  required
+                />
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium">
@@ -108,46 +141,70 @@ export function RegistrationForm({ onComplete }: RegistrationFormProps) {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="phone" className="text-sm font-medium">
-                Phone Number
-              </Label>
-              <Input
-                id="phone"
-                type="tel"
-                placeholder="Enter your phone number"
-                value={formData.phone}
-                onChange={(e) => handleInputChange("phone", e.target.value)}
-                className="h-12 bg-input border-border focus:ring-2 focus:ring-ring"
-                required
-              />
-            </div>
+            {!isLoginMode && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="phone" className="text-sm font-medium">
+                    Phone Number
+                  </Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="Enter your phone number"
+                    value={formData.phone}
+                    onChange={(e) => handleInputChange("phone", e.target.value)}
+                    className="h-12 bg-input border-border focus:ring-2 focus:ring-ring"
+                    required
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="nationality" className="text-sm font-medium">
-                Nationality
-              </Label>
-              <Select value={formData.nationality} onValueChange={(value) => handleInputChange("nationality", value)}>
-                <SelectTrigger className="h-12 bg-input border-border">
-                  <SelectValue placeholder="Select your country" />
-                </SelectTrigger>
-                <SelectContent>
-                  {countries.map((country) => (
-                    <SelectItem key={country} value={country}>
-                      {country}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="nationality" className="text-sm font-medium">
+                    Nationality
+                  </Label>
+                  <Select
+                    value={formData.nationality}
+                    onValueChange={(value) => handleInputChange("nationality", value)}
+                  >
+                    <SelectTrigger className="h-12 bg-input border-border">
+                      <SelectValue placeholder="Select your country" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {countries.map((country) => (
+                        <SelectItem key={country} value={country}>
+                          {country}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </>
+            )}
 
             <Button
               type="submit"
-              disabled={!isFormValid || isLoading}
+              disabled={(!isLoginMode && !isFormValid) || (isLoginMode && !formData.email) || isLoading}
               className="w-full h-12 bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90 text-accent-foreground font-medium transition-all duration-200 transform hover:scale-[1.02]"
             >
-              {isLoading ? "Creating Account..." : "Create Account"}
+              {isLoading
+                ? isLoginMode
+                  ? "Logging in..."
+                  : "Creating Account..."
+                : isLoginMode
+                  ? "Login"
+                  : "Create Account"}
             </Button>
+
+            <div className="text-center">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setIsLoginMode(!isLoginMode)}
+                className="text-sm text-muted-foreground hover:text-foreground"
+              >
+                {isLoginMode ? "Don't have an account? Register" : "Already have an account? Login"}
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>

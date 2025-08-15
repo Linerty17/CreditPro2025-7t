@@ -4,7 +4,8 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Play, DollarSign } from "lucide-react"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { Check } from "lucide-react"
 
 interface CodeVerificationProps {
   onVerified: () => void
@@ -15,6 +16,7 @@ interface CodeVerificationProps {
 export function CodeVerification({ onVerified, onSignUp, isReturningUser }: CodeVerificationProps) {
   const [code, setCode] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
 
   const handleNumberClick = (num: string) => {
     if (code.length < 5) {
@@ -33,13 +35,18 @@ export function CodeVerification({ onVerified, onSignUp, isReturningUser }: Code
 
       if (code === "22334") {
         setIsLoading(false)
-        onVerified()
+        setShowSuccessModal(true)
       } else {
         setIsLoading(false)
         alert("Invalid code. Please try again or purchase an access code.")
         setCode("")
       }
     }
+  }
+
+  const handleSuccessOk = () => {
+    setShowSuccessModal(false)
+    onVerified()
   }
 
   const handleSignUp = () => {
@@ -64,13 +71,8 @@ export function CodeVerification({ onVerified, onSignUp, isReturningUser }: Code
             </div>
           </div>
 
-          {/* Logo */}
-          <div className="mx-auto w-20 h-20 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center relative">
-            <Play className="w-6 h-6 text-white fill-white ml-1" />
-            <div className="absolute -top-1 -right-1 w-8 h-8 bg-white rounded-full flex items-center justify-center">
-              <DollarSign className="w-4 h-4 text-pink-500" />
-            </div>
-            <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-3 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full opacity-60"></div>
+          <div className="mx-auto w-20 h-20">
+            <img src="/cashpro-logo.png" alt="CashPro Logo" className="w-full h-full object-contain" />
           </div>
 
           <div className="space-y-2">
@@ -146,6 +148,38 @@ export function CodeVerification({ onVerified, onSignUp, isReturningUser }: Code
           </div>
         </CardContent>
       </Card>
+
+      <Dialog open={showSuccessModal} onOpenChange={() => {}}>
+        <DialogContent className="max-w-sm mx-auto bg-white border-0 shadow-2xl">
+          <div className="text-center py-8 space-y-6">
+            {/* Large checkmark circle */}
+            <div className="mx-auto w-24 h-24 bg-gradient-to-br from-green-400 to-green-500 rounded-full flex items-center justify-center shadow-lg">
+              <Check className="w-12 h-12 text-white stroke-[3]" />
+            </div>
+
+            {/* Welcome text with checkmark */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-center gap-2">
+                <span className="text-3xl font-bold text-gray-700">welcome</span>
+                <div className="w-8 h-8 bg-green-500 rounded flex items-center justify-center">
+                  <Check className="w-5 h-5 text-white stroke-[3]" />
+                </div>
+                <span className="text-3xl font-bold text-gray-700">!</span>
+              </div>
+
+              <p className="text-xl text-gray-600 font-medium">Login successful</p>
+            </div>
+
+            {/* OK button with lavender gradient */}
+            <Button
+              onClick={handleSuccessOk}
+              className="px-12 py-3 bg-gradient-to-r from-purple-400 to-purple-600 hover:from-purple-500 hover:to-purple-700 text-white font-semibold rounded-lg shadow-lg transform hover:scale-[1.02] transition-all duration-200"
+            >
+              OK
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

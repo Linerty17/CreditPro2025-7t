@@ -1,12 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Play, DollarSign, Clock, Eye, LogOut, Wallet, TrendingUp } from "lucide-react"
+import { Play, DollarSign, Clock, Eye, Wallet, TrendingUp } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 
 interface UserData {
   fullName: string
@@ -30,7 +32,7 @@ interface Video {
 }
 
 export function Dashboard({ userData }: DashboardProps) {
-  const [balance, setBalance] = useState(0)
+  const [balance, setBalance] = useState(7468)
   const [totalWatched, setTotalWatched] = useState(0)
   const [totalWatchTime, setTotalWatchTime] = useState(0)
   const [isWatching, setIsWatching] = useState(false)
@@ -92,6 +94,27 @@ export function Dashboard({ userData }: DashboardProps) {
       category: "Lifestyle",
     },
   ])
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false)
+  const [withdrawType, setWithdrawType] = useState<"bank" | "crypto">("bank")
+  const [withdrawForm, setWithdrawForm] = useState({
+    accountNumber: "",
+    accountName: "",
+    bankName: "",
+    amount: "",
+    walletAddress: "",
+    cryptoType: "",
+  })
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const increments = [135, 210, 80, 95, 150, 175, 120, 200]
+      const randomIncrement = increments[Math.floor(Math.random() * increments.length)]
+
+      setBalance((prev) => prev + randomIncrement)
+    }, 3000) // Every 3 seconds
+
+    return () => clearInterval(interval)
+  }, [])
 
   const handleWatchVideo = (video: Video) => {
     setCurrentVideo(video)
@@ -139,28 +162,59 @@ export function Dashboard({ userData }: DashboardProps) {
   const availableVideos = videos.filter((v) => !v.watched)
   const watchedVideos = videos.filter((v) => v.watched)
 
+  const handleWithdraw = () => {
+    const amount = Number(withdrawForm.amount)
+    if (amount > balance) {
+      alert("Insufficient balance")
+      return
+    }
+
+    setBalance((prev) => prev - amount)
+
+    // Generate receipt (simplified)
+    const receipt = {
+      id: Date.now().toString(),
+      amount,
+      type: withdrawType,
+      date: new Date().toISOString(),
+      status: "completed",
+    }
+
+    // Save to localStorage
+    const receipts = JSON.parse(localStorage.getItem("cashpro_receipts") || "[]")
+    receipts.push(receipt)
+    localStorage.setItem("cashpro_receipts", JSON.stringify(receipts))
+
+    alert(`Withdrawal of ₦${amount.toLocaleString()} successful!`)
+    setShowWithdrawModal(false)
+    setWithdrawForm({
+      accountNumber: "",
+      accountName: "",
+      bankName: "",
+      amount: "",
+      walletAddress: "",
+      cryptoType: "",
+    })
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-card to-primary/5">
+    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-green-300 to-purple-600">
       <div className="max-w-6xl mx-auto p-4 space-y-6">
-        {/* Header */}
-        <Card className="bg-gradient-to-r from-accent to-primary text-accent-foreground shadow-xl">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-3xl font-serif">Welcome back, {userData.fullName}!</CardTitle>
-                <p className="opacity-90 text-lg">Ready to earn some cash today?</p>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="text-right">
-                  <div className="text-4xl font-bold">${balance.toFixed(2)}</div>
-                  <p className="text-sm opacity-90">Available Balance</p>
-                </div>
-                <Button variant="secondary" size="icon" className="bg-white/20 hover:bg-white/30">
-                  <LogOut className="w-5 h-5" />
-                </Button>
-              </div>
+        <div className="text-center py-6">
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <div className="w-12 h-12">
+              <img src="/cashpro-logo.png" alt="CashPro" className="w-full h-full object-contain" />
             </div>
-          </CardHeader>
+            <h1 className="text-2xl font-bold text-gray-800">Hello, Valid User</h1>
+          </div>
+          <p className="text-lg text-gray-700">Good Day.</p>
+        </div>
+
+        <Card className="bg-green-500 text-white shadow-xl max-w-sm mx-auto">
+          <CardContent className="p-6">
+            <h2 className="text-lg font-semibold mb-2">Available Balance</h2>
+            <div className="text-3xl font-bold">₦{balance.toLocaleString()}</div>
+          </CardContent>
         </Card>
 
         {/* Stats Dashboard */}
@@ -175,7 +229,7 @@ export function Dashboard({ userData }: DashboardProps) {
           <Card className="hover:shadow-lg transition-shadow">
             <CardContent className="p-6 text-center">
               <DollarSign className="w-10 h-10 mx-auto mb-3 text-green-500" />
-              <div className="text-3xl font-bold text-foreground">${balance.toFixed(2)}</div>
+              <div className="text-3xl font-bold text-foreground">₦{balance.toLocaleString()}</div>
               <p className="text-sm text-muted-foreground">Total Earned</p>
             </CardContent>
           </Card>
@@ -202,7 +256,7 @@ export function Dashboard({ userData }: DashboardProps) {
             disabled={balance < 5}
           >
             <Wallet className="w-4 h-4 mr-2" />
-            Withdraw ${balance.toFixed(2)}
+            Withdraw ₦{balance.toLocaleString()}
           </Button>
           <Button variant="outline" className="px-6 bg-transparent">
             View Earnings History
@@ -232,7 +286,7 @@ export function Dashboard({ userData }: DashboardProps) {
                       <Play className="w-16 h-16 text-white fill-white" />
                     </div>
                     <Badge className="absolute top-3 right-3 bg-green-500 text-white font-bold text-lg px-3 py-1">
-                      +${video.reward}
+                      ₦{video.reward.toLocaleString()}
                     </Badge>
                     <Badge variant="secondary" className="absolute top-3 left-3">
                       {video.category}
@@ -246,8 +300,7 @@ export function Dashboard({ userData }: DashboardProps) {
                         {video.duration}
                       </span>
                       <span className="flex items-center gap-1 text-green-600 font-semibold">
-                        <DollarSign className="w-4 h-4" />
-                        {video.reward}
+                        ₦{video.reward.toLocaleString()}
                       </span>
                     </div>
                     <Button
@@ -285,7 +338,7 @@ export function Dashboard({ userData }: DashboardProps) {
                     </div>
                     <CardContent className="p-4">
                       <h3 className="font-semibold mb-2">{video.title}</h3>
-                      <p className="text-sm text-green-600 font-semibold">Earned: ${video.reward}</p>
+                      <p className="text-sm text-green-600 font-semibold">Earned: ₦{video.reward.toLocaleString()}</p>
                     </CardContent>
                   </Card>
                 ))}
@@ -293,6 +346,66 @@ export function Dashboard({ userData }: DashboardProps) {
             </CardContent>
           </Card>
         )}
+
+        <Card className="bg-white shadow-xl max-w-sm mx-auto">
+          <CardContent className="p-6 space-y-4">
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
+                <Input
+                  placeholder="Account Number"
+                  value={withdrawForm.accountNumber}
+                  onChange={(e) => setWithdrawForm((prev) => ({ ...prev, accountNumber: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Account Name</label>
+                <Input
+                  placeholder="Account Name"
+                  value={withdrawForm.accountName}
+                  onChange={(e) => setWithdrawForm((prev) => ({ ...prev, accountName: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Bank Name</label>
+                <Input
+                  placeholder="Bank Name"
+                  value={withdrawForm.bankName}
+                  onChange={(e) => setWithdrawForm((prev) => ({ ...prev, bankName: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
+                <Input
+                  placeholder="Amount in NGN"
+                  type="number"
+                  value={withdrawForm.amount}
+                  onChange={(e) => setWithdrawForm((prev) => ({ ...prev, amount: e.target.value }))}
+                />
+              </div>
+            </div>
+
+            <Button
+              onClick={() => setShowWithdrawModal(true)}
+              className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3"
+            >
+              Withdraw
+            </Button>
+          </CardContent>
+        </Card>
+
+        <div className="text-center">
+          <Button
+            onClick={() => {
+              setWithdrawType("crypto")
+              setShowWithdrawModal(true)
+            }}
+            variant="outline"
+            className="bg-gray-800 text-white hover:bg-gray-700 px-8 py-3 rounded-full"
+          >
+            <span className="mr-2">→</span> CRYPTO
+          </Button>
+        </div>
       </div>
 
       {/* Video Watching Modal */}
@@ -327,10 +440,72 @@ export function Dashboard({ userData }: DashboardProps) {
             {watchProgress === 100 && (
               <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
                 <div className="text-green-600 font-semibold text-lg">
-                  Congratulations! You earned ${currentVideo?.reward}
+                  Congratulations! You earned ₦{currentVideo?.reward.toLocaleString()}
                 </div>
               </div>
             )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showWithdrawModal} onOpenChange={setShowWithdrawModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{withdrawType === "bank" ? "Bank Withdrawal" : "Crypto Withdrawal"}</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {withdrawType === "bank" ? (
+              <>
+                <Input
+                  placeholder="Account Number"
+                  value={withdrawForm.accountNumber}
+                  onChange={(e) => setWithdrawForm((prev) => ({ ...prev, accountNumber: e.target.value }))}
+                />
+                <Input
+                  placeholder="Account Name"
+                  value={withdrawForm.accountName}
+                  onChange={(e) => setWithdrawForm((prev) => ({ ...prev, accountName: e.target.value }))}
+                />
+                <Input
+                  placeholder="Bank Name"
+                  value={withdrawForm.bankName}
+                  onChange={(e) => setWithdrawForm((prev) => ({ ...prev, bankName: e.target.value }))}
+                />
+              </>
+            ) : (
+              <>
+                <Select
+                  value={withdrawForm.cryptoType}
+                  onValueChange={(value) => setWithdrawForm((prev) => ({ ...prev, cryptoType: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="---SELECT CRYPTO TYPE ---" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="bitcoin">Bitcoin</SelectItem>
+                    <SelectItem value="ethereum">Ethereum</SelectItem>
+                    <SelectItem value="usdt">USDT</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Input
+                  placeholder="Wallet Address"
+                  value={withdrawForm.walletAddress}
+                  onChange={(e) => setWithdrawForm((prev) => ({ ...prev, walletAddress: e.target.value }))}
+                />
+              </>
+            )}
+
+            <Input
+              placeholder="Amount in NGN"
+              type="number"
+              value={withdrawForm.amount}
+              onChange={(e) => setWithdrawForm((prev) => ({ ...prev, amount: e.target.value }))}
+            />
+
+            <Button onClick={handleWithdraw} className="w-full bg-green-500 hover:bg-green-600">
+              Withdraw
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
