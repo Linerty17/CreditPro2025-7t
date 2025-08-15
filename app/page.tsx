@@ -7,13 +7,12 @@ export default function HomePage() {
   const router = useRouter()
 
   useEffect(() => {
-    // Check if user is logged in
+    const savedUserData = localStorage.getItem("cashpro-user")
     const isLoggedIn = localStorage.getItem("cashpro-logged-in")
-    const userData = localStorage.getItem("cashpro-user")
 
-    if (isLoggedIn === "true") {
+    if (isLoggedIn === "true" && savedUserData) {
       router.push("/dashboard")
-    } else if (userData) {
+    } else if (savedUserData) {
       router.push("/code")
     } else {
       router.push("/register")

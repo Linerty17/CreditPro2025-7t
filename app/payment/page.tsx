@@ -21,7 +21,13 @@ export default function PaymentPage() {
     router.push("/code")
   }
 
-  if (!userData) return null
+  if (!userData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-card to-primary/10 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-card to-primary/10">

@@ -7,7 +7,12 @@ export default function About() {
   const router = useRouter()
 
   const handleBack = () => {
-    router.back()
+    const isLoggedIn = localStorage.getItem("cashpro-logged-in")
+    if (isLoggedIn === "true") {
+      router.push("/dashboard")
+    } else {
+      router.push("/code")
+    }
   }
 
   return (
