@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -14,10 +15,6 @@ interface UserData {
   email: string
   phone: string
   nationality: string
-}
-
-interface RegistrationFormProps {
-  onComplete: (data: UserData) => void
 }
 
 const countries = [
@@ -35,7 +32,8 @@ const countries = [
   "South Africa",
 ]
 
-export function RegistrationForm({ onComplete }: RegistrationFormProps) {
+export function RegistrationForm() {
+  const router = useRouter()
   const [formData, setFormData] = useState<UserData>({
     fullName: "",
     email: "",
@@ -58,8 +56,9 @@ export function RegistrationForm({ onComplete }: RegistrationFormProps) {
       const user = existingUsers.find((u: UserData) => u.email === formData.email)
 
       if (user) {
+        localStorage.setItem("cashpro-user", JSON.stringify(user))
         setIsLoading(false)
-        onComplete(user)
+        router.push("/welcome")
       } else {
         setIsLoading(false)
         alert("User not found. Please register first.")
@@ -78,11 +77,11 @@ export function RegistrationForm({ onComplete }: RegistrationFormProps) {
         return
       }
 
-      // Save new user
       existingUsers.push(formData)
       localStorage.setItem("cashpro_users", JSON.stringify(existingUsers))
+      localStorage.setItem("cashpro-user", JSON.stringify(formData))
       setIsLoading(false)
-      onComplete(formData)
+      router.push("/welcome")
     }
   }
 
