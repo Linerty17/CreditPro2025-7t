@@ -37,11 +37,39 @@ export default function CashProApp() {
     } else {
       setNavigationHistory(["registration"])
     }
+
+    // Push initial state to browser history
+    if (typeof window !== "undefined") {
+      window.history.pushState({ page: "cashpro-app" }, "", window.location.href)
+
+      // Handle browser back button
+      const handlePopState = (event: PopStateEvent) => {
+        event.preventDefault()
+
+        // Always stay within the app - push state back
+        window.history.pushState({ page: "cashpro-app" }, "", window.location.href)
+
+        // Handle internal back navigation
+        handleBack()
+      }
+
+      window.addEventListener("popstate", handlePopState)
+
+      // Cleanup
+      return () => {
+        window.removeEventListener("popstate", handlePopState)
+      }
+    }
   }, [])
 
   const navigateToState = (newState: AppState, addToHistory = true) => {
     if (addToHistory && currentState !== newState) {
       setNavigationHistory((prev) => [...prev, newState])
+
+      // Push to browser history to maintain navigation stack
+      if (typeof window !== "undefined") {
+        window.history.pushState({ page: "cashpro-app", state: newState }, "", window.location.href)
+      }
     }
     setCurrentState(newState)
   }
@@ -58,6 +86,10 @@ export default function CashProApp() {
       if (previousState === "welcome") {
         setShowWelcome(true)
       }
+    } else {
+      const defaultState = userData ? "dashboard" : "verification"
+      setCurrentState(defaultState)
+      setNavigationHistory([defaultState])
     }
   }
 
