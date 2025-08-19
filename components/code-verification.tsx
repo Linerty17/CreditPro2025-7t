@@ -33,7 +33,7 @@ export function CodeVerification({ onVerified, onSignUp, isReturningUser }: Code
       setIsLoading(true)
       await new Promise((resolve) => setTimeout(resolve, 1500))
 
-      if (code === "22334") {
+      if (code === "12122") {
         setIsLoading(false)
         setShowSuccessModal(true)
       } else {
