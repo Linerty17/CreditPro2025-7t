@@ -9,8 +9,17 @@ import { PaymentFlow } from "@/components/payment-flow"
 import { ContactPage } from "@/components/contact-page"
 import { AboutPage } from "@/components/about-page"
 import { Navigation } from "@/components/navigation"
+import { CommunityPage } from "@/components/community-page"
 
-type AppState = "registration" | "welcome" | "verification" | "payment" | "dashboard" | "contact" | "about"
+type AppState =
+  | "registration"
+  | "welcome"
+  | "verification"
+  | "payment"
+  | "dashboard"
+  | "contact"
+  | "about"
+  | "community"
 
 interface UserData {
   fullName: string
@@ -174,6 +183,8 @@ export default function CashProApp() {
       {currentState === "contact" && <ContactPage onBack={canGoBack ? handleBack : handleBackToMain} />}
 
       {currentState === "about" && <AboutPage onBack={canGoBack ? handleBack : handleBackToMain} />}
+
+      {currentState === "community" && <CommunityPage onBack={canGoBack ? handleBack : handleBackToMain} />}
     </div>
   )
 }

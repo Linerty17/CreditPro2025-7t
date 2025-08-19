@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import Image from "next/image"
 
 interface NavigationProps {
-  onNavigate: (page: "contact" | "about") => void
+  onNavigate: (page: "contact" | "about" | "community") => void
   currentState: string
 }
 
@@ -25,6 +25,14 @@ export function Navigation({ onNavigate }: NavigationProps) {
             className="text-muted-foreground hover:text-primary"
           >
             About
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onNavigate("community")}
+            className="text-muted-foreground hover:text-primary"
+          >
+            Community
           </Button>
           <Button
             variant="ghost"
