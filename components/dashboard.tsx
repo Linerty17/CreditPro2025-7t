@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
+import { WithdrawalReceipt } from "./withdrawal-receipt"
 
 interface UserData {
   fullName: string
@@ -28,6 +29,8 @@ export function Dashboard({ userData }: DashboardProps) {
     walletAddress: "",
     cryptoType: "",
   })
+  const [showReceipt, setShowReceipt] = useState(false)
+  const [receiptData, setReceiptData] = useState<any>(null)
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -49,21 +52,41 @@ export function Dashboard({ userData }: DashboardProps) {
 
     setBalance((prev) => prev - amount)
 
-    // Generate receipt (simplified)
+    const refNumber = Math.floor(Math.random() * 90000000) + 10000000
+    const now = new Date()
+    const paymentTime =
+      now.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }) +
+      " " +
+      now.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      })
+
     const receipt = {
-      id: Date.now().toString(),
       amount,
+      refNumber: refNumber.toString(),
+      paymentTime,
+      accountName: withdrawForm.accountName || "N/A",
+      accountNumber: withdrawForm.accountNumber || withdrawForm.walletAddress || "N/A",
+      bankName: withdrawForm.bankName || withdrawForm.cryptoType || "N/A",
       type: withdrawType,
       date: new Date().toISOString(),
       status: "completed",
     }
+
+    setReceiptData(receipt)
+    setShowReceipt(true)
 
     // Save to localStorage
     const receipts = JSON.parse(localStorage.getItem("cashpro_receipts") || "[]")
     receipts.push(receipt)
     localStorage.setItem("cashpro_receipts", JSON.stringify(receipts))
 
-    alert(`Withdrawal of ₦${amount.toLocaleString()} successful!`)
     setWithdrawForm({
       accountNumber: "",
       accountName: "",
@@ -72,6 +95,11 @@ export function Dashboard({ userData }: DashboardProps) {
       walletAddress: "",
       cryptoType: "",
     })
+  }
+
+  const closeReceipt = () => {
+    setShowReceipt(false)
+    setReceiptData(null)
   }
 
   return (
@@ -85,7 +113,7 @@ export function Dashboard({ userData }: DashboardProps) {
             <div className="w-12 h-12">
               <img src="/cashpro-logo.png" alt="CashPro" className="w-full h-full object-contain" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-800">Hello, Valid User</h1>
+            <h1 className="text-2xl font-bold text-gray-800">Hello, {userData.fullName}</h1>
           </div>
           <p className="text-lg text-gray-700">Good Day.</p>
         </div>
@@ -205,6 +233,8 @@ export function Dashboard({ userData }: DashboardProps) {
           </Button>
         </div>
       </div>
+
+      {receiptData && <WithdrawalReceipt isOpen={showReceipt} onClose={closeReceipt} receiptData={receiptData} />}
 
       <style jsx>{`
         .rainbow-glow-bg {
