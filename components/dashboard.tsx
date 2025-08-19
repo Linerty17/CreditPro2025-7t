@@ -131,7 +131,7 @@ export function Dashboard({ userData }: DashboardProps) {
             <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
               <iframe
                 className="absolute top-0 left-0 w-full h-full rounded-lg shadow-xl"
-                src="https://www.youtube.com/embed/TYNv2EunJhE"
+                src="https://www.youtube.com/embed/UyXyING7JKI"
                 title="Earning Video"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
