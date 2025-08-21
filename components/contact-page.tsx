@@ -11,7 +11,7 @@ interface ContactPageProps {
 
 export function ContactPage({ onBack }: ContactPageProps) {
   const handleWhatsAppContact = () => {
-    window.open("https://wa.me/2349136574323", "_blank")
+    window.open("https://wa.me/+2349160594353", "_blank")
   }
 
   return (
