@@ -41,16 +41,8 @@ export function PaymentFlow({ userData, onComplete }: PaymentFlowProps) {
     setIsProcessing(true)
     setCurrentStep("confirmation")
 
-    // Simulate payment processing
     await new Promise((resolve) => setTimeout(resolve, 3000))
-    const paymentConfirmed = Math.random() > 0.5 // Simulate payment confirmation
-    if (paymentConfirmed) {
-      setIsProcessing(false)
-      onComplete()
-      return
-    } else {
-      setCurrentStep("payment-not-confirmed")
-    }
+    setCurrentStep("payment-not-confirmed")
     setIsProcessing(false)
   }
 
@@ -201,11 +193,11 @@ export function PaymentFlow({ userData, onComplete }: PaymentFlowProps) {
               <div className="flex justify-between items-center">
                 <span className="font-medium">Account Number</span>
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-blue-600 underline">5569742889</span>
+                  <span className="font-bold text-blue-600 underline">6066270617</span>
                   <Button
                     size="sm"
                     className="bg-orange-400 hover:bg-orange-500 text-white px-3 py-1 text-xs"
-                    onClick={() => handleCopyToClipboard("5569742889")}
+                    onClick={() => handleCopyToClipboard("6066270617")}
                   >
                     Copy
                   </Button>
@@ -214,12 +206,12 @@ export function PaymentFlow({ userData, onComplete }: PaymentFlowProps) {
 
               <div className="flex justify-between items-center">
                 <span className="font-medium">Bank Name</span>
-                <span className="font-bold">Moniepoint</span>
+                <span className="font-bold">Moniepoint MFB</span>
               </div>
 
               <div className="flex justify-between items-center">
                 <span className="font-medium">Account Name</span>
-                <span className="font-bold">Fresh liberty 🗽</span>
+                <span className="font-bold">SILVER AMARACHI THEOPHILUS</span>
               </div>
             </div>
 
