@@ -250,7 +250,7 @@ export function PaymentFlow({ userData, onComplete }: PaymentFlowProps) {
               </div>
               <div className="text-right">
                 <div className="text-2xl font-bold">NGN 6,600</div>
-                <div className="text-sm text-muted-foreground">sundaychinemerem66@gmail.com</div>
+                <div className="text-sm text-muted-foreground">{userData.email}</div>
               </div>
             </div>
 
@@ -295,7 +295,7 @@ export function PaymentFlow({ userData, onComplete }: PaymentFlowProps) {
               </div>
               <div className="text-right">
                 <div className="text-2xl font-bold">NGN 6,600</div>
-                <div className="text-sm text-muted-foreground">sundaychinemerem66@gmail.com</div>
+                <div className="text-sm text-muted-foreground">{userData.email}</div>
               </div>
             </div>
 
